@@ -95,7 +95,7 @@ void loop() {
     
 
     //CHECK FOR FOOD 
-    if (pressure >= 700 && breakfast == 0) { //if there is pressure and feeding hasnt been logged yet
+    if (pressure >= 700 && dinner == 0) { //if there is pressure and feeding hasnt been logged yet
     Dcount++; //add to the counter 
     Serial.print("Counter = ");
     Serial.println(Dcount);
