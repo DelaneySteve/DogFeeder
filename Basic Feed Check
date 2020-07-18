@@ -1,0 +1,154 @@
+#include <TimeLib.h>
+
+#include <LiquidCrystal.h>             //Servo library
+
+LiquidCrystal lcd(12,11,5,4,3,2);
+
+int pressure;
+int Bcount = 0;
+int Dcount = 0;
+int hFirstFeed, mFirstFeed, hSecFeed, mSecFeed;
+int breakfast = 0, dinner = 0;
+int h, m;
+int x, y;
+int backLight = 13;    // pin 13 will control the backlight
+
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(A0, INPUT); //set pressure sensure pin
+  lcd.begin(16,2);
+  pinMode(backLight, OUTPUT);
+  setTime(1595002740);
+}
+
+
+
+void loop() {
+  pressure = analogRead(A0);
+  h = hour();
+  m =  minute();
+
+
+ 
+  //CHECK screen
+//  lcd.setCursor(0,0);
+//  lcd.print(":)");
+
+  if (h >= 6 && h <= 14) {
+    digitalWrite(backLight, HIGH); // turn backlight on. Replace 'HIGH' with 'LOW' to turn it off.
+
+    Serial.println("morning");
+    //CHECK FOR FOOD 
+    if (pressure >= 700 && breakfast == 0) { //if there is pressure and feeding hasnt been logged yet
+    Bcount++; //add to the counter 
+    Serial.print("Counter = ");
+    Serial.println(Bcount);
+    }
+    
+    //LOG BREAKFAST 
+    if (Bcount == 300) { //if food has been there for 5 counts time
+    hFirstFeed= hour(); //record the time 
+    mFirstFeed= minute();
+    Bcount == 0; //reset the counter 
+    breakfast = 1; //log that food has been given 
+   }
+
+   //DISPLAY ON LCD
+   if (breakfast == 1) {
+
+    if(y == 1) {        //check if there is "NOT FED" on the screen***** format this!!!!!!!!****!!!!!!!
+    lcd.setCursor(0,0);
+      lcd.print("                                                                   ");
+    }
+    y = 0;
+    Serial.println("LCD ON");
+    lcd.setCursor(0,0);
+    lcd.print("Breakfast: ");
+    lcd.print(hFirstFeed);
+    lcd.print(":");
+    lcd.print(mFirstFeed);
+   }
+   else if (breakfast == 0) {
+     if(y == 0) {
+    lcd.setCursor(0,0);
+      lcd.print("                                                                   ");
+    }
+    y = 1;
+    Serial.println("LCD ON");
+    lcd.setCursor(0,0);
+    lcd.print("NOT FED!!!!");
+   }
+
+      
+  }
+
+
+    
+  }
+
+  if (h >= 15 && h <= 23) {
+    digitalWrite(backLight, HIGH);
+    Serial.println("afternoon");
+
+    
+    
+
+    //CHECK FOR FOOD 
+    if (pressure >= 700 && breakfast == 0) { //if there is pressure and feeding hasnt been logged yet
+    Dcount++; //add to the counter 
+    Serial.print("Counter = ");
+    Serial.println(Dcount);
+    }
+
+
+   //LOG DINNER 
+    if (Dcount == 300) { //if food has been there for 5 counts time
+    hSecFeed= hour(); //record the time 
+    mSecFeed= minute();
+    Dcount == 0; //reset the counter 
+    dinner = 1; //log that food has been given 
+   }
+
+   //DISPLAY ON LCD
+   if (dinner == 1) {
+    
+    Serial.println("LCD ON");
+
+   if(x == 1) {
+    lcd.setCursor(0,1);
+    lcd.print("                                                                   ");
+     }
+        x = 0;
+
+    lcd.setCursor(0,1);
+    lcd.print("Dinner: ");
+    lcd.print(hSecFeed);
+    lcd.print(":");
+    lcd.print(mSecFeed);
+   }
+   else if (dinner == 0) {
+    if(x == 0) {
+    lcd.setCursor(0,1);
+      lcd.print("                                                                   ");
+  }
+    Serial.println("LCD ON");
+    lcd.setCursor(0,1);
+    lcd.print("NOT FED!!!!");
+    x = 1;
+   }
+    
+ 
+  }
+
+if (h >= 24 && h <= 5) {
+  Serial.println("night");
+ dinner = 0;
+ breakfast = 0;
+   digitalWrite(backLight, LOW); // turn backlight on. Replace 'HIGH' with 'LOW' to turn it off.
+
+}
+
+  delay(15);
+
+}
